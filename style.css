@@ -5,23 +5,24 @@
    ========================================================= */
 
 :root {
-  --bg: #f4f7fb;
+  --bg: #eef6f4;
   --surface: #ffffff;
-  --surface-soft: #f8fafc;
-  --text: #172033;
-  --muted: #667085;
-  --line: #e4e7ec;
-  --primary: #1677ff;
-  --primary-soft: #eaf3ff;
+  --surface-soft: #f3faf8;
+  --text: #10241f;
+  --muted: #5b7a72;
+  --line: #d7ece5;
+  --primary: #0f7a5f;
+  --primary-soft: #e2f5ee;
+  --accent: #f2a950;
   --success: #14804a;
   --success-soft: #eaf8f0;
-  --warning: #b54708;
-  --warning-soft: #fff4e5;
+  --warning: #b5680e;
+  --warning-soft: #fff2e0;
   --danger: #b42318;
   --danger-soft: #fff0ef;
-  --dark: #101828;
-  --radius: 16px;
-  --shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+  --dark: #0b2b23;
+  --radius: 18px;
+  --shadow: 0 10px 28px rgba(11, 43, 35, 0.10);
 }
 
 * {
@@ -30,7 +31,7 @@
 
 body {
   margin: 0;
-  font-family: Inter, Arial, Helvetica, sans-serif;
+  font-family: "Poppins", "Segoe UI", Arial, Helvetica, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
@@ -41,7 +42,7 @@ body {
   justify-content: space-between;
   gap: 24px;
   align-items: center;
-  background: linear-gradient(135deg, #0c4a6e, #1677ff);
+  background: linear-gradient(135deg, #0b2b23, #0f7a5f 55%, #16a97a);
   color: white;
 }
 
@@ -268,10 +269,29 @@ th {
   font-weight: 800;
 }
 
-.badge-terjadwal,
-.badge-menunggu {
+.badge-terjadwal {
   background: var(--primary-soft);
   color: var(--primary);
+}
+
+.badge-menunggu {
+  background: #fdeecb;
+  color: #8a5a00;
+}
+
+.badge-berpotensi-terlambat {
+  background: #ffe3d1;
+  color: #9a3b12;
+}
+
+.btn.accent {
+  background: var(--accent);
+  color: #3a2200;
+}
+
+.section-heading .btn-group {
+  display: flex;
+  gap: 8px;
 }
 
 .badge-berlangsung {
@@ -426,74 +446,5 @@ footer {
   .section-heading {
     align-items: flex-start;
     flex-direction: column;
-  }
-}
-
-
-/* =========================================================
-   IDENTITAS KELOMPOK 9B + FITUR KESIAPAN SESI
-   Penambahan ini mempertahankan struktur/desain utama.
-   ========================================================= */
-
-.topbar {
-  position: relative;
-}
-
-.topbar::after {
-  content: "KELOMPOK 9B";
-  position: absolute;
-  right: clamp(20px, 5vw, 72px);
-  top: 8px;
-  font-size: .68rem;
-  font-weight: 800;
-  letter-spacing: .12em;
-  opacity: .72;
-}
-
-.readiness-strip {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 12px;
-}
-
-.readiness-card {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px 14px;
-  line-height: 1.4;
-  background: var(--surface-soft);
-}
-
-.readiness-card strong {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.readiness-card span {
-  font-size: .82rem;
-}
-
-.readiness-card.ready {
-  background: var(--success-soft);
-  border-color: #9ed6ba;
-  color: var(--success);
-}
-
-.readiness-card.risk {
-  background: var(--warning-soft);
-  border-color: #f8c98b;
-  color: var(--warning);
-}
-
-@media (max-width: 640px) {
-  .topbar::after {
-    position: static;
-    display: block;
-    margin-top: 8px;
-  }
-
-  .readiness-strip {
-    grid-template-columns: 1fr;
   }
 }

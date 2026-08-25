@@ -4,15 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Prototype Dashboard Penjadwalan Hemodialisis - Praktikum Pertemuan 7" />
-  <title>Dashboard Penjadwalan Hemodialisis</title>
+  <title>RenalCare HD Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="topbar">
     <div>
-      <p class="eyebrow">PRAKTIKUM PERTEMUAN 7 • KELOMPOK 9B</p>
-      <h1>Dashboard Penjadwalan Hemodialisis</h1>
-      <p class="subtitle">Kelompok 9B • Prototype berbasis HTML, CSS, dan JavaScript • Data 100% sintetis</p>
+      <p class="eyebrow">PRAKTIKUM PERTEMUAN 7 • KELOMPOK RENALCARE</p>
+      <h1>RenalCare HD Dashboard</h1>
+      <p class="subtitle">Dashboard penjadwalan hemodialisis • Data 100% sintetis</p>
     </div>
     <div class="date-box">
       <span>Hari/Tanggal</span>
@@ -21,11 +23,6 @@
   </header>
 
   <main class="container">
-    <section class="notice" aria-label="Identitas kelompok">
-      <strong>IDENTITAS KELOMPOK 9B:</strong>
-      Dashboard ini dikembangkan oleh Kelompok 9B dengan data pasien dan mesin yang sepenuhnya sintetis untuk kebutuhan praktikum.
-    </section>
-
     <section class="notice" aria-label="Catatan etika data">
       <strong>Catatan Etika:</strong>
       Jangan menggunakan nama, NIK, nomor rekam medis, alamat, nomor telepon, atau data pasien nyata.
@@ -65,10 +62,12 @@
           <p class="eyebrow">PERINGATAN OTOMATIS</p>
           <h2>Kontrol Risiko Penjadwalan</h2>
         </div>
-        <button id="resetBtn" class="btn secondary" type="button">Reset Filter</button>
+        <div class="btn-group">
+          <button id="downloadCsvBtn" class="btn accent" type="button">Unduh CSV</button>
+          <button id="resetBtn" class="btn secondary" type="button">Reset Filter</button>
+        </div>
       </div>
       <div id="warningArea" class="warning-grid"></div>
-      <div id="sessionReadiness" class="readiness-strip" aria-live="polite"></div>
     </section>
 
     <section class="section-card">
@@ -177,11 +176,6 @@
         </div>
 
         <div class="mini-note">
-          <strong>Fitur baru Kelompok 9B:</strong>
-          Sistem otomatis memeriksa kesiapan mesin terhadap jumlah pasien aktif pada setiap sesi dan memberi peringatan jika kapasitas mesin berisiko tidak mencukupi.
-        </div>
-
-        <div class="mini-note">
           <strong>Diskusi kelompok:</strong>
           Apakah dashboard ini sudah cukup membantu petugas HD mencegah jadwal bentrok,
           memantau mesin maintenance, dan melihat keterlambatan?
@@ -208,7 +202,7 @@
   </main>
 
   <footer>
-    Dashboard Hemodialisis • Kelompok 9B • Praktikum Transformasi Manajemen Informasi Kesehatan Ginjal • Data Sintetis
+    Prototype Praktikum Transformasi Manajemen Informasi Kesehatan Ginjal • Data Sintetis
   </footer>
 
   <script src="script.js"></script>

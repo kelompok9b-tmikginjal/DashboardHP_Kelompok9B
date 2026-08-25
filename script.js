@@ -11,7 +11,8 @@ const machines = [
   { id: "HD-03", status: "Maintenance", catatan: "Kalibrasi sampai 13.00" },
   { id: "HD-04", status: "Aktif", catatan: "Siap digunakan" },
   { id: "HD-05", status: "Aktif", catatan: "Siap digunakan" },
-  { id: "HD-06", status: "Aktif", catatan: "Siap digunakan" }
+  { id: "HD-06", status: "Aktif", catatan: "Siap digunakan" },
+  { id: "HD-07", status: "Aktif", catatan: "Siap digunakan" }
 ];
 
 // 2) DATA JADWAL PASIEN SINTETIS
@@ -33,7 +34,9 @@ const schedules = [
   { patient: "P013", session: "Siang", machine: "HD-05", start: "12:00", end: "16:00", status: "Terjadwal",   note: "-" },
   { patient: "P014", session: "Siang", machine: "HD-06", start: "12:00", end: "16:00", status: "Terjadwal",   note: "-" },
   { patient: "P015", session: "Siang", machine: "HD-01", start: "12:00", end: "16:00", status: "Batal",       note: "Konfirmasi pembatalan pasien" },
-  { patient: "P016", session: "Siang", machine: "HD-05", start: "12:00", end: "16:00", status: "Terlambat",  note: "Belum hadir sesuai jadwal" }
+  { patient: "P016", session: "Siang", machine: "HD-05", start: "12:00", end: "16:00", status: "Terlambat",  note: "Belum hadir sesuai jadwal" },
+  { patient: "P017", session: "Pagi",  machine: "HD-07", start: "07:00", end: "11:00", status: "Terjadwal",   note: "-" },
+  { patient: "P018", session: "Siang", machine: "HD-07", start: "12:00", end: "16:00", status: "Menunggu",    note: "Menunggu hasil lab pra-HD" }
 ];
 
 // Kapasitas contoh per sesi.
@@ -49,7 +52,7 @@ const searchPatient = document.getElementById("searchPatient");
 const warningArea = document.getElementById("warningArea");
 const machineGrid = document.getElementById("machineGrid");
 const resetBtn = document.getElementById("resetBtn");
-const sessionReadiness = document.getElementById("sessionReadiness");
+const downloadCsvBtn = document.getElementById("downloadCsvBtn");
 
 // 3) TANGGAL OTOMATIS
 document.getElementById("currentDate").textContent =
@@ -73,14 +76,14 @@ function badgeClass(status) {
   return "badge-" + status.toLowerCase().replaceAll(" ", "-");
 }
 
-// 6) RENDER TABEL BERDASARKAN FILTER
-function renderSchedule() {
+// 6) FILTER (dipakai bersama oleh tabel dan ekspor CSV)
+function getFilteredSchedules() {
   const sessionValue = filterSession.value;
   const statusValue = filterStatus.value;
   const machineValue = filterMachine.value;
   const keyword = searchPatient.value.trim().toUpperCase();
 
-  const filtered = schedules.filter(item => {
+  return schedules.filter(item => {
     const sessionMatch = sessionValue === "Semua" || item.session === sessionValue;
     const statusMatch = statusValue === "Semua" || item.status === statusValue;
     const machineMatch = machineValue === "Semua" || item.machine === machineValue;
@@ -88,6 +91,11 @@ function renderSchedule() {
 
     return sessionMatch && statusMatch && machineMatch && patientMatch;
   });
+}
+
+// RENDER TABEL BERDASARKAN FILTER
+function renderSchedule() {
+  const filtered = getFilteredSchedules();
 
   document.getElementById("visibleCount").textContent = filtered.length;
 
@@ -163,6 +171,24 @@ function findConflicts() {
   return conflicts;
 }
 
+// 9b) FITUR/PERINGATAN BARU: DETEKSI BERPOTENSI TERLAMBAT (berbasis jam nyata)
+// Membandingkan jam saat ini dengan jam mulai jadwal. Jika sudah lewat jam
+// mulai namun status pasien masih "Terjadwal" atau "Menunggu", pasien
+// ditandai berpotensi terlambat meskipun field status belum diubah manual.
+function findPotentialDelays() {
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  return schedules.filter(item => {
+    if (item.status !== "Terjadwal" && item.status !== "Menunggu") return false;
+
+    const [hh, mm] = item.start.split(":").map(Number);
+    const startMinutes = hh * 60 + mm;
+
+    return nowMinutes > startMinutes;
+  });
+}
+
 // 10) PERINGATAN OTOMATIS
 function renderWarnings() {
   const warnings = [];
@@ -208,6 +234,15 @@ function renderWarnings() {
     });
   }
 
+  const potentialDelays = findPotentialDelays();
+  if (potentialDelays.length > 0) {
+    warnings.push({
+      type: "warning",
+      title: "Berpotensi Terlambat (Jam Nyata)",
+      text: `Sudah melewati jam mulai namun status belum berjalan: ${potentialDelays.map(x => `${x.patient} (${x.start})`).join(", ")}.`
+    });
+  }
+
   if (warnings.length === 0) {
     warnings.push({
       type: "success",
@@ -240,48 +275,47 @@ function renderSessionIndicators() {
   });
 }
 
-// 12) FITUR BARU KELOMPOK 9B: PEMERIKSAAN KESIAPAN MESIN PER SESI
-function renderSessionReadiness() {
-  const cards = ["Pagi", "Siang"].map(session => {
-    const activePatients = schedules.filter(
-      item => item.session === session && item.status !== "Batal"
-    );
+// 11b) FITUR BARU: UNDUH JADWAL (SESUAI FILTER AKTIF) SEBAGAI CSV
+function downloadScheduleCsv() {
+  const filtered = getFilteredSchedules();
+  const header = ["No", "Kode Pasien", "Sesi", "Mesin", "Mulai", "Estimasi Selesai", "Status", "Catatan"];
 
-    const usableMachines = machines.filter(
-      machine => machine.status === "Aktif"
-    );
+  const rows = filtered.map((item, index) => [
+    index + 1,
+    item.patient,
+    item.session,
+    item.machine,
+    item.start,
+    item.end,
+    item.status,
+    item.note
+  ]);
 
-    // Satu mesin diasumsikan melayani satu pasien pada satu waktu.
-    const enough = usableMachines.length >= activePatients.length;
-    const deficit = Math.max(activePatients.length - usableMachines.length, 0);
+  const csvContent = [header, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+    .join("\n");
 
-    if (enough) {
-      return `
-        <div class="readiness-card ready">
-          <strong>${session} siap</strong>
-          <span>${activePatients.length} pasien aktif • ${usableMachines.length} mesin aktif</span>
-        </div>
-      `;
-    }
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const today = new Intl.DateTimeFormat("id-ID").format(new Date()).replaceAll("/", "-");
 
-    return `
-      <div class="readiness-card risk">
-        <strong>${session} berisiko penuh</strong>
-        <span>${activePatients.length} pasien aktif • ${usableMachines.length} mesin aktif • kekurangan ${deficit} mesin</span>
-      </div>
-    `;
-  });
-
-  sessionReadiness.innerHTML = cards.join("");
+  link.href = url;
+  link.download = `jadwal-hd-${today}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
-// 13) EVENT FILTER
-
+// 12) EVENT FILTER
 [filterSession, filterStatus, filterMachine].forEach(element => {
   element.addEventListener("change", renderSchedule);
 });
 
 searchPatient.addEventListener("input", renderSchedule);
+
+downloadCsvBtn.addEventListener("click", downloadScheduleCsv);
 
 resetBtn.addEventListener("click", () => {
   filterSession.value = "Semua";
@@ -297,4 +331,3 @@ renderSchedule();
 renderMachines();
 renderWarnings();
 renderSessionIndicators();
-renderSessionReadiness();

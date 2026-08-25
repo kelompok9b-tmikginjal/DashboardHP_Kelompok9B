@@ -1,7 +1,5 @@
 # Praktikum Pertemuan 7 — Dashboard Penjadwalan Hemodialisis
 
-**Identitas: KELOMPOK 9B**
-
 Prototype ini digunakan sebagai **contoh praktikum** mata kuliah Transformasi Manajemen Informasi Kesehatan Ginjal.
 
 ## Tujuan
@@ -45,7 +43,6 @@ dashboard_hd_praktikum/
 - Deteksi sederhana jadwal mesin bentrok.
 - Peringatan kapasitas sesi.
 - Indikator pemanfaatan sesi.
-- **Fitur baru Kelompok 9B: pemeriksaan kesiapan mesin per sesi.**
 
 ## Data
 
